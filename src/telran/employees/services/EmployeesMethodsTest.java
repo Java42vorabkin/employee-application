@@ -3,7 +3,6 @@ package telran.employees.services;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,27 +51,38 @@ List<Employee> employeesList = Arrays.asList(empl1,empl2,empl3,empl4,empl5,empl6
 
 	@Test
 	void testRemoveEmployee() {
-		//TODO
+		assertEquals(ReturnCode.OK, employees.removeEmployee(ID3));
+		assertEquals(ReturnCode.EMPLOYEE_NOT_FOUND, employees.removeEmployee(ID3));
 	}
 
 	@Test
 	void testGetAllEmployees() {
-		//TODO
+		for (Employee employee : employees.getAllEmployees()) {
+			assertTrue(employeesList.contains(employee));
+		}
+		Iterator<Employee> itr = employees.getAllEmployees().iterator();
+		while(itr.hasNext()) {
+			Employee emp = itr.next();
+//			System.out.println("id="+emp.id);
+		}
 	}
 
 	@Test
 	void testGetEmployee() {
-		//TODO
+		assertEquals(empl1, employees.getEmployee(ID1));
+		assertNull(employees.getEmployee(ID1+1000));
 	}
 
 	@Test
 	void testGetEmployeesByAge() {
-		//TODO
+		assertTrue(((List<Employee>) employees.getEmployeesByAge(20, 40)).size()>0);
+		assertEquals(0, ((List<Employee>) employees.getEmployeesByAge(1, 5)).size());
 	}
 
 	@Test
 	void testGetEmployeesBySalary() {
-		//TODO
+		assertTrue(((List<Employee>) employees.getEmployeesBySalary(5000, 8000)).size()>0);
+		assertEquals(0, ((List<Employee>) employees.getEmployeesBySalary(2000, 4500)).size());
 	}
 
 	@Test
@@ -83,17 +93,39 @@ List<Employee> employeesList = Arrays.asList(empl1,empl2,empl3,empl4,empl5,empl6
 
 	@Test
 	void testGetEmployeesByDepartmentAndSalary() {
-		//TODO
+		List<Employee> expected = Arrays.asList(empl1, empl2, empl3);
+		assertIterableEquals(expected, employees.getEmployeesByDepartmentAndSalary(DEPARTMENT1, SALARY1, SALARY2));
 	}
 
 	@Test
 	void testUpdateSalary() {
-		//TODO
+		assertEquals(ReturnCode.OK, employees.updateSalary(ID3, 60000));
+		assertEquals(ReturnCode.EMPLOYEE_NOT_FOUND, employees.updateSalary(999, 60000));
+		assertEquals(60000, employees.getEmployee(ID3).salary);
 	}
 
 	@Test
 	void testUpdateDepartment() {
-		//TODO
+		String newDepartment = "other department";
+		assertEquals(ReturnCode.OK, employees.updateDepartment(ID6, newDepartment));
+		assertEquals(ReturnCode.EMPLOYEE_NOT_FOUND, employees.updateDepartment(888, newDepartment));
+		assertEquals(newDepartment, employees.getEmployee(ID6).department);
+		assertIterableEquals(Arrays.asList(employees.getEmployee(ID6)),
+				employees.getEmployeesByDepartment(newDepartment));
 	}
 
+	@Test
+	void testExample() {
+		Employee emp = employees.getEmployee(ID2);
+		System.out.println("BEFORE OUT name="+emp.name+"  IN name="+ employees.getEmployee(ID2).name);
+		emp.name = "Haim";
+		System.out.println("AFTER OUT name="+emp.name+"  IN name="+ employees.getEmployee(ID2).name);
+// ===================================================		
+		EmployeesMethodsMapsExample employeesExample = new EmployeesMethodsMapsExample();
+		employeesList.forEach(employeesExample::addEmployee);
+		Employee empExample = employeesExample.getEmployee(ID2);
+		System.out.println("\nExample BEFORE OUT name="+empExample.name+"  IN name="+ employeesExample.getEmployee(ID2).name);
+		empExample.name = "Haim";
+		System.out.println("Example AFTER OUT name="+empExample.name+"  IN name="+ employeesExample.getEmployee(ID2).name+"\n");
+	}
 }
